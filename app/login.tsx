@@ -9,85 +9,133 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { defaultStyles } from "@/constants/Styles";
 import Colors from "@/constants/Colors";
+import { SignedIn, useAuth, useSignIn, useSignUp } from "@clerk/clerk-expo";
 
 const Login = () => {
   const { type } = useLocalSearchParams<{ type?: string }>(); // type can be a string or undefined
   const [loading, setLoading] = useState(false);
   const { top } = useSafeAreaInsets();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("ihaseebullahtarakai@gmail.com");
   const [password, setPassword] = useState("");
+  const { signIn, isLoaded, setActive } = useSignIn();
+  const { isSignedIn } = useAuth();
+  const Router = useRouter();
+  const [authLoading, setAuthLoading] = useState(false);
+  const {
+    signUp,
+    isLoaded: signupLoaded,
+    setActive: signupSetActive,
+  } = useSignUp();
   const onSignUp = async () => {
-    console.log(
-      "User Signed up with credentials Email: " +
-        email +
-        " and Password: " +
-        password
-    );
+    setAuthLoading(true);
+    if (!signupLoaded) {
+      console.log("SignUp is not loaded");
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await signUp.create({
+        emailAddress: email,
+        password: password,
+      });
+      signupSetActive({ session: result.createdSessionId });
+    } catch (error: any) {
+      console.log(error.errors);
+      Alert.alert(error.errors[0].longMessage);
+    } finally {
+      setLoading(false);
+      setAuthLoading(false);
+    }
   };
   const onLogin = async () => {
-    console.log(
-      "User Logged in with credentials Email: " +
-        email +
-        " and Password: " +
-        password
-    );
+    setAuthLoading(true);
+
+    if (!isLoaded) return;
+    setLoading(true);
+    if (isSignedIn) {
+      Router.replace("/(tabs)/");
+    }
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+      setActive({ session: result.createdSessionId });
+    } catch (error: any) {
+      Alert.alert(error.errors[0].longMessage);
+    } finally {
+      setLoading(false);
+      setAuthLoading(false);
+    }
   };
   return (
-    <KeyboardAvoidingView
-      keyboardVerticalOffset={1}
-      style={[
-        styles.container,
-        {
-          paddingTop: top,
-        },
-      ]}
-      behavior={Platform.OS === "android" ? "padding" : "height"}
-    >
-      {loading ? (
-        <View style={defaultStyles.loadingOverlay}>
-          <ActivityIndicator size={"large"} color={"#fff"} />
+    <>
+      {authLoading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size={"large"} color={"#000"} />
         </View>
       ) : (
-        <View>
-          <Image
-            style={styles.logo}
-            source={require("../assets/images/chatgpt.png")}
-          />
-          <Text style={styles.title}>
-            {type === "login" ? "Welcome Back" : "Create an account"}
-          </Text>
-          <View style={styles.form}>
-            <TextInput
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              placeholder="Email Address"
-              style={styles.inputField}
-            />
-            <TextInput
-              onChangeText={setPassword}
-              autoCapitalize="none"
-              placeholder="Password"
-              style={styles.inputField}
-              secureTextEntry
-            />
-            <TouchableOpacity
-              onPress={type === "login" ? onLogin : onSignUp}
-              style={[defaultStyles.btn, styles.btn]}
-            >
-              <Text style={styles.btn}>
-                {type === "login" ? "Login" : "Create account"}
+        <KeyboardAvoidingView
+          keyboardVerticalOffset={1}
+          style={[
+            styles.container,
+            {
+              paddingTop: top,
+            },
+          ]}
+          behavior={Platform.OS === "android" ? "padding" : "height"}
+        >
+          {loading ? (
+            <View style={defaultStyles.loadingOverlay}>
+              <ActivityIndicator size={"large"} color={"#fff"} />
+            </View>
+          ) : (
+            <View>
+              <Image
+                style={styles.logo}
+                source={require("../assets/images/chatgpt.png")}
+              />
+              <Text style={styles.title}>
+                {type === "login" ? "Welcome Back" : "Create an account"}
               </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+              <View style={styles.form}>
+                <TextInput
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  placeholder="Email Address"
+                  style={styles.inputField}
+                  value={email}
+                />
+                <TextInput
+                  onChangeText={setPassword}
+                  autoCapitalize="none"
+                  placeholder="Password"
+                  style={styles.inputField}
+                  secureTextEntry
+                />
+                <TouchableOpacity
+                  onPress={type === "login" ? onLogin : onSignUp}
+                  style={[defaultStyles.btn, styles.btn]}
+                >
+                  <Text style={styles.btn}>
+                    {type === "login" ? "Login" : "Create account"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </KeyboardAvoidingView>
       )}
-    </KeyboardAvoidingView>
+    </>
   );
 };
 
