@@ -73,7 +73,7 @@ const DrawerContent = (props: any) => {
             style={{
               height: 40,
               width: 40,
-              borderRadius:10
+              borderRadius: 10,
             }}
           />
           <Text style={{ fontSize: 15, fontWeight: "600" }}>
@@ -129,7 +129,8 @@ const Layout = () => {
       <Drawer.Screen
         name="(chat)/newChat"
         options={{
-          title: "ChatGPT",
+          headerTitleAlign: "center",
+          title: "New ChatGpt",
           drawerIcon: () => {
             return (
               <View>
@@ -160,6 +161,7 @@ const Layout = () => {
       <Drawer.Screen
         name="dalle"
         options={{
+          headerTitleAlign: "center",
           title: "Dall-E",
           drawerIcon: () => {
             return (
@@ -177,6 +179,7 @@ const Layout = () => {
         name="explore"
         options={{
           title: "Explore",
+          headerTitleAlign: "center",
           drawerIcon: () => {
             return (
               <View
