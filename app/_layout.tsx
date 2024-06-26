@@ -62,7 +62,7 @@ function InitialLayout() {
     if (inAuthGroup && !isSignedIn) {
       Router.replace("/");
     } else if (!inAuthGroup && isSignedIn) {
-      Router.replace("/(auth)/");
+      Router.replace("/(auth)/(drawer)/(chat)/newChat");
     }
   }, [isSignedIn]);
 

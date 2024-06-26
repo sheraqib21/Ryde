@@ -60,7 +60,7 @@ const Login = () => {
     if (!isLoaded) return;
     setLoading(true);
     if (isSignedIn) {
-      Router.replace("/(tabs)/");
+      Router.replace("/(auth)/(drawer)/(chat)/(new)/");
     }
     try {
       const result = await signIn.create({
