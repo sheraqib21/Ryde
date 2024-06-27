@@ -130,7 +130,7 @@ const Layout = () => {
         name="(chat)/newChat"
         options={{
           headerTitleAlign: "center",
-          title: "New ChatGpt",
+          title: "ChatGpt",
           drawerIcon: () => {
             return (
               <View>
