@@ -72,32 +72,31 @@ function InitialLayout() {
         <ActivityIndicator size={"large"} color={"#000"} />
       </View>
     );
+
   }
 
   //Clerk setup from now on
-  return (
-    <Stack>
+   return (
+    <Stack initialRouteName="welcome">
+      <Stack.Screen name="welcome" options={{ headerShown: false }} />
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
         name="login"
         options={{
-          presentation: "modal",
-          headerShown: Platform.OS === "android" ? false : true,
-          title: "",
+          presentation: 'modal',
+          headerShown: Platform.OS === 'android' ? false : true,
+          title: '',
           headerLeft: () => {
             return (
               <TouchableOpacity>
-                <Ionicons
-                  onPress={() => Router.back()}
-                  size={28}
-                  name="close-outline"
-                />
+                <Ionicons name="arrow-back" size={24} color="black" />
               </TouchableOpacity>
             );
           },
         }}
       />
-      <Stack.Screen  name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
+      <Slot />
     </Stack>
   );
 }
