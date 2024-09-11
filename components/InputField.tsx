@@ -7,38 +7,39 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     Platform,
+    StyleSheet,
 } from "react-native";
-
-import {InputFieldProps} from "@/types/type";
+import { InputFieldProps } from "@/types/type";
 
 const InputField = ({
-                        label,
-                        icon,
-                        secureTextEntry = false,
-                        labelStyle,
-                        containerStyle,
-                        inputStyle,
-                        iconStyle,
-                        className,
-                        ...props
-                    }: InputFieldProps) => {
+    label,
+    icon,
+    secureTextEntry = false,
+    labelStyle,
+    containerStyle,
+    inputStyle,
+    iconStyle,
+    className,
+    ...props
+}: InputFieldProps) => {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ width: "100%" }}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View className="my-2 w-full">
-                    <Text className={`text-lg font-JakartaSemiBold mb-3 ${labelStyle}`}>
-                        {label}
-                    </Text>
-                    <View
-                        className={`flex flex-row justify-start items-center relative bg-neutral-100 rounded-full border border-neutral-100 focus:border-primary-500  ${containerStyle}`}
-                    >
+                <View style={{ marginVertical: 10, width: "100%" }}>
+                    {label && (
+                        <Text style={[styles.label, labelStyle]}>
+                            {label}
+                        </Text>
+                    )}
+                    <View style={[styles.inputContainer, containerStyle]}>
                         {icon && (
-                            <Image source={icon} className={`w-6 h-6 ml-4 ${iconStyle}`}/>
+                            <Image source={icon} style={[styles.icon, iconStyle]} />
                         )}
                         <TextInput
-                            className={`rounded-full p-4 font-JakartaSemiBold text-[15px] flex-1 ${inputStyle} text-left`}
+                            style={[styles.input, inputStyle]}
                             secureTextEntry={secureTextEntry}
                             {...props}
                         />
@@ -48,5 +49,34 @@ const InputField = ({
         </KeyboardAvoidingView>
     );
 };
+
+const styles = StyleSheet.create({
+    label: {
+        fontSize: 16,
+        fontWeight: "600",
+        marginBottom: 5,
+    },
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F1F1F1",
+        borderRadius: 50,
+        paddingHorizontal: 15,
+        borderColor: "#E2E8F0",
+        borderWidth: 1,
+        height: 50,
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        marginRight: 10,
+    },
+    input: {
+        flex: 1,
+        fontSize: 16,
+        paddingVertical: 10,
+        color: "#333",
+    },
+});
 
 export default InputField;
