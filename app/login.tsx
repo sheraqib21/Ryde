@@ -80,7 +80,7 @@ const SignUp = () => {
         password: loginForm.password,
       });
       setActive({ session: result.createdSessionId });
-      router.replace("/(auth)/(drawer)/(chat)/newChat/"); // Navigate to your home or chat screen after login
+      router.replace("/(tabs)/home"); // Navigate to your home or chat screen after login
       setModalVisible(false); // Close modal after successful login
     } catch (error: any) {
       Alert.alert("Login Error", error.errors[0]?.longMessage || "Could not find your account");
@@ -184,7 +184,7 @@ const SignUp = () => {
             >
               <View style={styles.modalContainer}>
                 <View style={styles.modalView}>
-                  <Text style={styles.modalTitle}>Welcome Back</Text>
+                  <Text style={styles.modalTitle}>Welcome Back 👋 </Text>
 
                   <InputField
                     label="Email"

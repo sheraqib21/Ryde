@@ -62,7 +62,7 @@ function InitialLayout() {
     if (inAuthGroup && !isSignedIn) {
       Router.replace("/");
     } else if (!inAuthGroup && isSignedIn) {
-      Router.replace("/(auth)/(drawer)/(chat)/newChat");
+      Router.replace("/(tabs)/home");
     }
   }, [isSignedIn]);
 
@@ -96,6 +96,7 @@ function InitialLayout() {
         }}
       />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Slot />
     </Stack>
   );
