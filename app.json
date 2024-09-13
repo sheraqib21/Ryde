@@ -23,11 +23,16 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "origin": "https://Ryde.com/"
+        }
+      ],
       "expo-secure-store",
       [
         "expo-build-properties",
@@ -42,6 +47,10 @@
         }
       ]
     ],
+    // "extra": {
+    //   "CLERK_PUBLISHABLE_KEY": process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    //   "CLERK_SECRET_KEY": process.env.CLERK_SECRET_KEY
+    // },
     "experiments": {
       "typedRoutes": true
     }

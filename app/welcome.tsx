@@ -17,7 +17,7 @@ const Home = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <TouchableOpacity
         onPress={() => {
-          router.replace("/login");
+          router.replace("/SignUp");
         }}
         style={{ width: '100%', alignItems: 'flex-end', padding: 20 }}
       >
@@ -54,7 +54,7 @@ const Home = () => {
         title={isLastSlide ? "Get Started" : "Next"}
         onPress={() =>
           isLastSlide
-            ? router.replace("/login")
+            ? router.replace("/SignUp")
             : swiperRef.current?.scrollBy(1)
         }
         style={{ width: '90%', marginTop: 20, marginBottom: 20, alignSelf: 'center' }}
