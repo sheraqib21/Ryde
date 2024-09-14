@@ -97,6 +97,10 @@ function InitialLayout() {
       />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="SignUp"
+        options={{ headerShown: false }} // This hides the header on SignUp screen
+      />
       <Slot />
     </Stack>
   );

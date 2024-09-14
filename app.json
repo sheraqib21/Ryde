@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Ryde",
-    "slug": "Ryde",
+    "name": "uber",
+    "slug": "uber",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2F80ED"
     },
     "ios": {
       "supportsTablet": true
@@ -30,27 +30,10 @@
       [
         "expo-router",
         {
-          "origin": "https://Ryde.com/"
-        }
-      ],
-      "expo-secure-store",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 33,
-            "targetSdkVersion": 33,
-            "minSdkVersion": 24,
-            "buildToolsVersion": "33.0.0",
-            "kotlinVersion": "1.6.20"
-          }
+          "origin": "https://uber.dev/"
         }
       ]
     ],
-    // "extra": {
-    //   "CLERK_PUBLISHABLE_KEY": process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    //   "CLERK_SECRET_KEY": process.env.CLERK_SECRET_KEY
-    // },
     "experiments": {
       "typedRoutes": true
     }
