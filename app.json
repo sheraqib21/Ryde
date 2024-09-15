@@ -36,6 +36,9 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    // "extra": {
+    //   "EXPO_PUBLIC_GEOAPIFY_API_KEY": process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY
+    // }
   }
 }
