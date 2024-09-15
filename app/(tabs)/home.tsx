@@ -1,7 +1,7 @@
 import RideCard from '@/components/RideCard';
 import { icons } from '@/constants';
 import { SignedIn, useUser } from '@clerk/clerk-expo';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Platform, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const recentRides=[
@@ -108,12 +108,18 @@ export default function Home() {
   const { user } = useUser();
 
   return (
-    <SafeAreaView className="bg-gray-500">
-      <FlatList
-        data={recentRides} // Pass the recentRides array directly
-        keyExtractor={(item) => item.ride_id} // Ensure each item has a unique key
-        renderItem={({ item }) => <RideCard ride={item} icons={icons} />} // Pass each ride object to RideCard
-      />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F3F4F9' }} edges={['top']}>
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={recentRides}
+          keyExtractor={(item) => item.ride_id}
+          renderItem={({ item }) => <RideCard ride={item} icons={icons} />}
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === 'ios' ? 100 : 90, // Adjust this value based on your navigation bar height
+          }}
+        />
+      </View>
+      {Platform.OS === 'ios' && <View style={{ height: 34, backgroundColor: '#F3F4F9' }} />}
     </SafeAreaView>
   );
 }   

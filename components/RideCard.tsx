@@ -1,141 +1,105 @@
-import React, { useState, useEffect } from 'react';
-import { Image, Text, View, StyleSheet, ImageErrorEventData, NativeSyntheticEvent } from 'react-native';
-import { Ride } from '@/types/type';
-import Constants from 'expo-constants';
-import { icons } from '@/constants';
-
-const formatDate = (dateString: string): string => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-  
-  const formatTime = (timeString: string): string => {
-    const date = new Date(timeString);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = hours % 12 || 12;
-    return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-  };
-const getMapImageUrl = (latitude: string, longitude: string): string | null => {
-  const apiKey = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY;
-  if (!apiKey) {
-    console.error('Geoapify API Key is missing');
-    return null;
-  }
-  return `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${longitude},${latitude}&zoom=14&apiKey=${apiKey}`;
-};
+import React from 'react';
+import { Image, Text, View, StyleSheet, ScrollView } from 'react-native'; // Make sure ScrollView is imported
+import { useFonts } from 'expo-font';
+import { icons } from "@/constants";
+import { formatDate, formatTime } from "@/lib/utils";
+import { Ride } from "@/types/type";
 
 const RideCard = ({ ride }: { ride: Ride }) => {
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [fontsLoaded] = useFonts({
+    'PlusJakartaSans-Medium': require('@/assets/fonts/PlusJakartaSans-Medium.ttf'),
+    'PlusJakartaSans-Bold': require('@/assets/fonts/PlusJakartaSans-ExtraBoldItalic.ttf'),
+  });
 
-  useEffect(() => {
-    const url = getMapImageUrl(ride.destination_latitude, ride.destination_longitude);
-    setMapUrl(url);
-    if (!url) {
-      setError('Failed to generate map URL');
-    }
-    // Log for debugging
-    console.log('Map URL:', url);
-    console.log('API Key:', process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY);
-  }, [ride]);
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
-    <View style={styles.cardContainer}>
-      {mapUrl ? (
-        <Image
-          source={{ uri: mapUrl }}
-          style={styles.mapImage}
-          onError={(e: NativeSyntheticEvent<ImageErrorEventData>) => {
-            console.log('Image loading error:', e.nativeEvent.error);
-            setError('Failed to load map image');
-          }}
-        />
-      ) : (
-        <View style={[styles.mapImage, styles.placeholderImage]}>
-          <Text>{error || 'Map not available'}</Text>
-        </View>
-      )}
-      
+    
       <View style={styles.container}>
-        {/* Origin and Destination details */}
-        <View style={styles.detailContainer}>
-          <Image source={icons.to} style={styles.icon} />
-          <Text style={styles.detailText} numberOfLines={1}>
-            {ride.origin_address}
-          </Text>
+        <View style={styles.contentContainer}>
+          <View style={styles.topSection}>
+            <Image
+              source={{
+                uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${ride.destination_longitude},${ride.destination_latitude}&zoom=14&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
+              }}
+              style={styles.mapImage}
+            />
+            <View style={styles.addressContainer}>
+              <View style={styles.addressRow}>
+                <Image source={icons.to} style={styles.icon} />
+                <Text style={styles.addressText} numberOfLines={1}>
+                  {ride.origin_address}
+                </Text>
+              </View>
+              <View style={styles.addressRow}>
+                <Image source={icons.point} style={styles.icon} />
+                <Text style={styles.addressText} numberOfLines={1}>
+                  {ride.destination_address}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.detailsContainer}>
+            {[
+              { label: 'Date & Time', value: `${formatDate(ride.created_at)}, ${formatTime(ride.ride_time)}` },
+              { label: 'Driver', value: `${ride.driver.first_name} ${ride.driver.last_name}` },
+              { label: 'Car Seats', value: ride.driver.car_seats.toString() },
+              { label: 'Payment Status', value: ride.payment_status, isPaymentStatus: true },
+            ].map((detail, index) => (
+              <View key={index} style={[styles.detailRow, index === 3 && styles.lastDetailRow]}>
+                <Text style={styles.detailLabel}>{detail.label}</Text>
+                <Text
+                  style={[
+                    styles.detailValue,
+                    detail.isPaymentStatus && { color: ride.payment_status === "paid" ? "#22C55E" : "#EF4444" },
+                  ]}
+                >
+                  {detail.value}
+                </Text>
+              </View>
+            ))}
+            
+          </View>
         </View>
-        <View style={styles.detailContainer}>
-          <Image source={icons.point} style={styles.icon} />
-          <Text style={styles.detailText} numberOfLines={1}>
-            {ride.destination_address}
-          </Text>
-        </View>
-
-        {/* New block with additional ride details */}
-        
-        <View style={styles.additionalInfoContainer}>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Date & Time</Text>
-            <Text style={styles.value} numberOfLines={1}>
-              {formatDate(ride.created_at)}, {formatTime(ride.ride_time)}
-            </Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Driver</Text>
-            <Text style={styles.value}>
-              {ride.driver.first_name} {ride.driver.last_name}
-            </Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Car Seats</Text>
-            <Text style={styles.value}>{ride.driver.car_seats}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Payment Status</Text>
-            <Text
-              style={[
-                styles.value,
-                { color: ride.payment_status === "paid" ? "green" : "red" },
-              ]}
-            >
-              {ride.payment_status}
-            </Text>
-          </View>
-        </View>
-
-
       </View>
-    </View>
+    
+    
   );
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
+  scrollViewContainer: {
+    paddingBottom: 2, // Add padding to prevent overlap with the nav bar
+  },
+  container: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    shadowColor: '#D4D4D4',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+    marginBottom: 12,
+  },
+  contentContainer: {
+    padding: 12,
+  },
+  topSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    shadowColor: '#aaa',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
-    marginBottom: 15,
-    padding: 10,
   },
   mapImage: {
     width: 80,
     height: 90,
-    borderRadius: 10,
-    marginRight: 15,
+    borderRadius: 8,
   },
-  placeholderImage: {
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+  addressContainer: {
+    marginLeft: 20,
+    flex: 1,
   },
-  detailContainer: {
+  addressRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
@@ -145,34 +109,35 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: 8,
   },
-  detailText: {
+  addressText: {
     fontSize: 14,
-    fontWeight: '500',
-  },
-  container: {
+    fontFamily: 'PlusJakartaSans-Medium',
     flex: 1,
-    justifyContent: 'space-between',
-    marginTop: 10,
   },
-  additionalInfoContainer: {
-    marginTop: 10,
-    backgroundColor: '#f5f5f5',
+  detailsContainer: {
+    marginTop: 20,
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
-    padding: 10,
+    padding: 12,
+    
+    
   },
-  infoRow: {
+  detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5,
+    marginBottom: 10,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+  lastDetailRow: {
+    marginBottom: 0,
   },
-  value: {
+  detailLabel: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'PlusJakartaSans-Medium',
+    color: '#6B7280',
+  },
+  detailValue: {
+    fontSize: 14,
+    fontFamily: 'PlusJakartaSans-Bold',
   },
 });
 
