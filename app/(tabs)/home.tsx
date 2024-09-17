@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { FlatList, Image, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';//#F3F4F9
 import * as Location from 'expo-location';
+import { router } from 'expo-router';
 
 const recentRides = [
   {
@@ -117,9 +118,16 @@ export default function Home() {
   const handleSignOut = () => {
     // Implement your sign out logic here
   };
-  const handleDestinationPress = () => {
-    // Implement your destination press logic here
-  };
+  const handleDestinationPress = (location:{
+    latitude: number,
+    longitude: number,
+    address: string,
+  })=>{
+    setDestinationLocation(location);
+     router.push('/(root)/find-ride')
+    
+    // Open the navigation app and navigate to the destination location
+  }
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();

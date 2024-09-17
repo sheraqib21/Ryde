@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, StyleSheet, Image, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { View, TextInput, FlatList, Text, TouchableOpacity, StyleSheet, Image, TouchableWithoutFeedback, Keyboard, AppState } from "react-native";
 import axios from 'axios';
 
-const geoapifyApiKey = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY; // Replace with your Geoapify API Key
+const geoapifyApiKey = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY;
 
 const GeoapifyAutocomplete = ({
   icon,
@@ -15,22 +15,50 @@ const GeoapifyAutocomplete = ({
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Fetch suggestions from Geoapify API
+  useEffect(() => {
+    const clearSuggestions = () => {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    };
+
+    clearSuggestions();
+    
+    const handleAppStateChange = (nextAppState) => {
+      if (nextAppState === 'active') {
+        clearSuggestions();
+      }
+    };
+
+    const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      appStateSubscription.remove();
+    };
+  }, []);
+
+  // New effect to handle empty input
+  useEffect(() => {
+    if (input.trim() === '') {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [input]);
+
   const fetchSuggestions = async (text) => {
     if (text.trim() === '') {
-      // Don't fetch suggestions if input is empty
       setSuggestions([]);
+      setShowSuggestions(false);
       return;
     }
     try {
-      const response = await axios.get(`https://api.geoapify.com/v1/geocode/autocomplete`, {
+      const response = await axios.get('https://api.geoapify.com/v1/geocode/autocomplete', {
         params: {
           text: text,
           apiKey: geoapifyApiKey,
         },
       });
       setSuggestions(response.data.features);
-      setShowSuggestions(true); // Show suggestions
+      setShowSuggestions(true);
     } catch (error) {
       console.error("Error fetching suggestions from Geoapify:", error);
     }
@@ -38,11 +66,17 @@ const GeoapifyAutocomplete = ({
 
   const handleInputChange = (text) => {
     setInput(text);
-    fetchSuggestions(text);
+    if (text.trim() === '') {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    } else {
+      fetchSuggestions(text);
+    }
   };
 
   const handlePressOutside = () => {
-    setShowSuggestions(false); // Hide suggestions when clicking outside
+    setShowSuggestions(false);
+    setSuggestions([]);
     Keyboard.dismiss();
   };
 
@@ -59,7 +93,11 @@ const GeoapifyAutocomplete = ({
             placeholderTextColor="gray"
             value={input}
             onChangeText={handleInputChange}
-            onFocus={() => setShowSuggestions(input.trim() !== '')} // Show suggestions when input is focused
+            onFocus={() => {
+              if (input.trim() !== '') {
+                setShowSuggestions(true);
+              }
+            }}
           />
           {icon && (
             <View style={styles.iconContainer}>
@@ -68,7 +106,6 @@ const GeoapifyAutocomplete = ({
           )}
         </View>
 
-        {/* Render Suggestions */}
         {showSuggestions && suggestions.length > 0 && (
           <FlatList
             data={suggestions}
@@ -77,14 +114,14 @@ const GeoapifyAutocomplete = ({
               <TouchableOpacity
                 style={styles.suggestionItem}
                 onPress={() => {
-                  setInput(item.properties.formatted); // Update input with the selected place
+                  setInput(item.properties.formatted);
                   handlePress({
                     latitude: item.geometry.coordinates[1],
                     longitude: item.geometry.coordinates[0],
                     address: item.properties.formatted,
                   });
-                  setSuggestions([]); // Clear suggestions
-                  setShowSuggestions(false); // Hide suggestions
+                  setSuggestions([]);
+                  setShowSuggestions(false);
                 }}
               >
                 <Text>{item.properties.formatted}</Text>
@@ -97,6 +134,8 @@ const GeoapifyAutocomplete = ({
     </TouchableWithoutFeedback>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
