@@ -12,7 +12,7 @@ const RideCard = ({ ride }: { ride: Ride }) => {
   });
 
   if (!fontsLoaded) {
-    return null; // or a loading indicator
+    return null; // no fonts loaded yet - nothing toriop[]
   }
 
   return (
