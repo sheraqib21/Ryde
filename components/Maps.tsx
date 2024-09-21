@@ -1,9 +1,9 @@
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE, Region, Polyline } from 'react-native-maps';
 import { icons } from '@/constants';
 import { calculateRegion, generateMarkersFromData } from '@/lib/map';
 import { useDriverStore, useLocationStore } from '@/store';
-import { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 
 // Define the structure for MarkerData
 interface MarkerData {
@@ -53,67 +53,101 @@ const drivers = [
 ];
 
 const Map = () => {
-  const {
-    userLongitude,
-    userLatitude,
-    destinationLongitude,
-    destinationLatitude,
-  } = useLocationStore();
-
-  const { selectedDrivers, setDrivers } = useDriverStore();
-  const [markers, setMarkers] = useState<MarkerData[]>([]);
-
-  const region: Region = calculateRegion({
-    userLongitude,
-    userLatitude,
-    destinationLongitude,
-    destinationLatitude,
-  });
-
-  useEffect(() => {
-    if (Array.isArray(drivers)) {
-      if (!userLatitude || !userLongitude) return;
-
-      const newMarkers = generateMarkersFromData({
-        data: drivers,
-        userLatitude,
-        userLongitude,
-      });
-
-      setMarkers(newMarkers);
-    }
-  }, [drivers, userLatitude, userLongitude]);
-
-  return (
-    <View style={styles.container}>
-      <MapView
-        provider={PROVIDER_GOOGLE} // Use Google Maps as the provider
-        style={styles.map}
-        showsPointsOfInterest={false}
-        showsUserLocation={true}
-        userInterfaceStyle="dark"
-        showsCompass={true}
-        initialRegion={region}
-      >
-        {markers.map((marker) => (
-          <Marker
-            key={marker.id}
-            coordinate={{
-              latitude: marker.latitude,
-              longitude: marker.longitude,
-            }}
-            title={marker.title}
-            image={
-              selectedDrivers === marker.id
-                ? icons.selectedMarker
-                : icons.marker
-            }
-          />
-        ))}
-      </MapView>
-    </View>
-  );
-};
+    const {
+      userLongitude,
+      userLatitude,
+      destinationLongitude,
+      destinationLatitude,
+    } = useLocationStore();
+  
+    const { selectedDrivers, setDrivers } = useDriverStore();
+    const [markers, setMarkers] = useState([]);
+    const [routeCoordinates, setRouteCoordinates] = useState([]);
+  
+    const region = calculateRegion({
+      userLongitude,
+      userLatitude,
+      destinationLongitude,
+      destinationLatitude,
+    });
+  
+    useEffect(() => {
+      if (Array.isArray(drivers)) {
+        if (!userLatitude || !userLongitude) return;
+  
+        const newMarkers = generateMarkersFromData({
+          data: drivers,
+          userLatitude,
+          userLongitude,
+        });
+  
+        setMarkers(newMarkers);
+      }
+    }, [drivers, userLatitude, userLongitude]);
+  
+    useEffect(() => {
+      const fetchRoute = async () => {
+        if (!userLatitude || !userLongitude || !destinationLatitude || !destinationLongitude) return;
+  
+        try {
+          const response = await fetch(
+            `https://api.geoapify.com/v1/routing?waypoints=${userLatitude},${userLongitude}|${destinationLatitude},${destinationLongitude}&mode=drive&apiKey=b5c7f4c229a34d9f9b2805d1b0c8c411`
+          );
+          const data = await response.json();
+  
+          if (data.features.length > 0) {
+            const coordinates = data.features[0].geometry.coordinates[0].map(coord => ({
+              latitude: coord[1],
+              longitude: coord[0]
+            }));
+            setRouteCoordinates(coordinates);
+          }
+        } catch (error) {
+          console.error('Error fetching route:', error);
+        }
+      };
+  
+      fetchRoute();
+    }, [userLatitude, userLongitude, destinationLatitude, destinationLongitude]);
+  
+    return (
+      <View style={styles.container}>
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          showsPointsOfInterest={false}
+          showsUserLocation={true}
+          userInterfaceStyle="dark"
+          showsCompass={true}
+          initialRegion={region}
+        >
+          {markers.map((marker) => (
+            <Marker
+              key={marker.id}
+              coordinate={{
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }}
+              title={marker.title}
+              image={
+                selectedDrivers === marker.id
+                  ? icons.selectedMarker
+                  : icons.marker
+              }
+            />
+          ))}
+  
+          {routeCoordinates.length > 0 && (
+            <Polyline
+              coordinates={routeCoordinates}
+              strokeColor="#0000FF" // Blue color for the route
+              strokeWidth={3}
+            />
+          )}
+        </MapView>
+      </View>
+    );
+  };
 
 const styles = StyleSheet.create({
   container: {
@@ -121,7 +155,7 @@ const styles = StyleSheet.create({
     height: '100%', // Adjust height as needed to match the UI
     borderRadius: 15,
     overflow: 'hidden',
-    marginTop:40
+    marginTop: 40,
   },
   map: {
     width: '100%',
