@@ -4,10 +4,10 @@ import BottomSheet, {
   } from "@gorhom/bottom-sheet";
   import { router } from "expo-router";
   import React, { useRef } from "react";
-  import { Image, Text, TouchableOpacity, View, StyleSheet, SafeAreaView, StatusBar } from "react-native";
+  import { Image, Text, TouchableOpacity, View, StyleSheet } from "react-native";
   import { GestureHandlerRootView } from "react-native-gesture-handler";
   
-  import Map from "@/components/Map";
+  import Maps from "@/components/Maps";
   import { icons } from "@/constants";
   
   const RideLayout = ({
@@ -22,34 +22,38 @@ import BottomSheet, {
     const bottomSheetRef = useRef<BottomSheet>(null);
   
     return (
-      <GestureHandlerRootView style={styles.flex1}>
-        <View style={styles.flex1}>
-          <StatusBar barStyle="light-content" />
-          <Map style={styles.map} />
-          <SafeAreaView style={styles.overlay}>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Image
-                  source={icons.backArrow}
-                  resizeMode="contain"
-                  style={styles.backIcon}
-                />
+      <GestureHandlerRootView style={styles.flexOne}>
+        <View style={styles.container}>
+          <View style={styles.mapContainer}>
+            <View style={styles.headerContainer}>
+              <TouchableOpacity onPress={() => router.back()}>
+                <View style={styles.backButton}>
+                  <Image
+                    source={icons.backArrow}
+                    resizeMode="contain"
+                    style={styles.backIcon}
+                  />
+                </View>
               </TouchableOpacity>
-              <Text style={styles.headerText}>{title || "Go Back"}</Text>
+              <Text style={styles.titleText}>
+                {title || "Go Back"}
+              </Text>
             </View>
-          </SafeAreaView>
+  
+            <Maps />
+          </View>
+  
           <BottomSheet
             ref={bottomSheetRef}
             snapPoints={snapPoints || ["40%", "85%"]}
             index={0}
-            style={styles.bottomSheet}
           >
             {title === "Choose a Rider" ? (
-              <BottomSheetView style={styles.bottomSheetContent}>
+              <BottomSheetView style={styles.bottomSheetView}>
                 {children}
               </BottomSheetView>
             ) : (
-              <BottomSheetScrollView style={styles.bottomSheetContent}>
+              <BottomSheetScrollView style={styles.bottomSheetScrollView}>
                 {children}
               </BottomSheetScrollView>
             )}
@@ -60,62 +64,58 @@ import BottomSheet, {
   };
   
   const styles = StyleSheet.create({
-    flex1: {
+    flexOne: {
       flex: 1,
     },
-    map: {
-      ...StyleSheet.absoluteFillObject,
-      marginTop:10 // This ensures the map fills its parent container
+    container: {
+      flex: 1,
+      backgroundColor: 'white',
     },
-    overlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
+    mapContainer: {
+      flex: 1,
+      flexDirection: 'column',
+      height: '100%',
+      backgroundColor: '#b3b1b1', // blue-500
     },
-    header: {
+    headerContainer: {
       flexDirection: 'row',
+      position: 'absolute',
+      zIndex: 10,
+      top: 64, // top-16 in tailwind
       alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingTop: 10,
-      paddingBottom: 20,
+      justifyContent: 'flex-start',
+      paddingHorizontal: 20, // px-5 in tailwind
     },
     backButton: {
-      width: 40,
-      height: 40,
+      width: 45, // w-10 in tailwind
+      height: 45, // h-10 in tailwind
       backgroundColor: 'white',
-      borderRadius: 20,
+      borderRadius: 9999, // rounded-full in tailwind
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: 15,
+      marginTop: -10,
+      fontWeight:'bold' // text-lg in tailwind
     },
     backIcon: {
-      width: 20,
-      height: 20,
-      tintColor: '#3b82f6',
+      width: 24, // w-6 in tailwind
+      height: 24, // h-6 in tailwind
+       // mt-0.5 in tailwind
     },
-    headerText: {
-      fontSize: 20,
-      fontFamily: 'JakartaSemiBold',
-      color: 'white',
-      textShadowColor: 'rgba(0, 0, 0, 0.75)',
-      textShadowOffset: { width: -1, height: 1 },
-      textShadowRadius: 10,
+    titleText: {
+      fontSize: 25, // text-xl in tailwind
+      fontWeight:'bold', // font-JakartaSemiBold in tailwind
+      marginLeft: 10, 
+      marginTop: -10,// ml-5 in tailwind
     },
-    bottomSheet: {
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: -4,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
+    bottomSheetView: {
+      flex: 1,
+      padding: 20,
     },
-    bottomSheetContent: {
+    bottomSheetScrollView: {
       flex: 1,
       padding: 20,
     },
   });
   
   export default RideLayout;
+  

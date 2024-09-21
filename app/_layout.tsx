@@ -102,8 +102,8 @@ function InitialLayout() {
         options={{ headerShown: false }} // This hides the header on SignUp screen
       />
       <Stack.Screen name="(root)/find-ride" options={{ headerShown: false }} />
-      {/* <Stack.Screen name="(root)/confirm-ride" options={{ headerShown: false }} />
-      <Stack.Screen name="(root)/book-ride" options={{ headerShown: false }} /> */}
+      <Stack.Screen name="(root)/confirm-ride" options={{ headerShown: false }} />
+      <Stack.Screen name="(root)/book-ride" options={{ headerShown: false }} />
       <Slot />
     </Stack>
   );
