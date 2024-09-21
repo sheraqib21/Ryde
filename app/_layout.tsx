@@ -106,8 +106,7 @@ function InitialLayout() {
       <Stack.Screen name="(root)/book-ride" options={{ headerShown: false }} />
       <Slot />
     </Stack>
-  );
-}
+  );}
 
 export default function RootLayout() {
   return (
