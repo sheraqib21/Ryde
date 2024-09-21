@@ -110,6 +110,8 @@ const Map = () => {
             }
           />
         ))}
+
+
       </MapView>
     </View>
   );

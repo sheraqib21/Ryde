@@ -87,8 +87,8 @@ import BottomSheet, {
       paddingHorizontal: 20, // px-5 in tailwind
     },
     backButton: {
-      width: 45, // w-10 in tailwind
-      height: 45, // h-10 in tailwind
+      width: 40, // w-10 in tailwind
+      height: 40, // h-10 in tailwind
       backgroundColor: 'white',
       borderRadius: 9999, // rounded-full in tailwind
       alignItems: 'center',
@@ -102,7 +102,7 @@ import BottomSheet, {
        // mt-0.5 in tailwind
     },
     titleText: {
-      fontSize: 25, // text-xl in tailwind
+      fontSize: 20, // text-xl in tailwind
       fontWeight:'bold', // font-JakartaSemiBold in tailwind
       marginLeft: 10, 
       marginTop: -10,// ml-5 in tailwind

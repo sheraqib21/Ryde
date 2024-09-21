@@ -44,7 +44,7 @@ const drivers = [
     },
   ];
 const ConfirmRide = () => {
-//   const { drivers, selectedDriver, setSelectedDriver } = useDriverStore();
+  const { selectedDriver, setSelectedDriver } = useDriverStore();
 
   return (
     <RideLayout title={"Choose a Rider"} snapPoints={["65%", "85%"]}>
@@ -54,8 +54,8 @@ const ConfirmRide = () => {
         renderItem={({ item }) => (
           <DriverCard
             item={item}
-            // selected={selectedDriver!}
-            // setSelected={() => setSelectedDriver(item.id!)}
+            selected={selectedDriver!}
+            setSelected={() => setSelectedDriver(Number(item.id)!)}
 
           />
         )}
